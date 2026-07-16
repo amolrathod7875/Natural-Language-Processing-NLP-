@@ -37,7 +37,7 @@ final_text = remove_punc(expended)
 print(f"Removed Punctuation : {final_text}")
 
 blog = TextBlob(final_text)
-print(f"Correct Order : {blog.correct()}")
+print(f"Correct Order : {blog.correct().string}")
 
 
 
