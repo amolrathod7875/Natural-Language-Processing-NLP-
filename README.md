@@ -25,12 +25,54 @@ NLP/
 │   ├── stemming_and_lemmatization.py  # Stem vs Lemma comparison
 │   ├── punctuation.py         # Punctuation removal utilities
 │   └── practice.py            # Practice exercises
-└── Day_1_NLP_Pipeline/
-    ├── Text_Processing/
-    │   └── data_acquisition.py # TMDB API data fetching and CSV export
-    └── Short_Hand/
-        └── json_convt.py      # JSON conversion utilities
+├── Day_1_NLP_Pipeline/
+│   ├── Text_Processing/
+│   │   ├── data_acquisition.py    # TMDB API data fetching and CSV export
+│   │   ├── text_processing_task.ipynb
+│   │   └── tmdb_action_movies.csv
+│   ├── IMBD_Case_Study/
+│   │   └── Case_1_IMDB.ipynb
+│   ├── Short_Hand/
+│   │   ├── json_convt.py      # JSON conversion utilities
+│   │   └── slang.txt
+│   ├── spelling_correction.ipynb
+│   ├── emojis_text_cleaning.ipynb
+│   ├── html_text_cleaning.ipynb
+│   ├── Task_1_Speeling_Correction.md
+│   ├── Task_1_Emoji_Cleaning.md
+│   └── Task_1_HTML_Cleaning.md
+├── Day_2_Text_Processing/
+│   ├── preprocessing.ipynb      # Text preprocessing techniques
+│   ├── Feature_Extraction.ipynb # Feature extraction methods
+│   └── IMDB Dataset.csv
+├── Day_3_Text_Classification/
+│   ├── word2vec_demo.ipynb      # Word2Vec demonstration
+│   ├── Game_of_thrones/
+│   │   ├── word2vec.ipynb
+│   │   └── data/
+│   │       ├── 001ssb.txt
+│   │       ├── 002ssb.txt
+│   │       ├── 003ssb.txt
+│   │       ├── 004ssb.txt
+│   │       └── 005ssb.txt
+│   └── GoogleNews-vectors-negative300.bin.gz  # Pre-trained Word2Vec model
+├── Day_4_Word2Vec/
+│   ├── Word2Vec.ipynb           # Word2Vec implementation
+│   ├── Tf-IDF.ipynb             # TF-IDF vectorization
+│   ├── Bag_Of_Words.ipynb       # Bag of Words model
+│   └── IMDB Dataset.csv
+└── Day_5_Parts_of_Speech_Tagging/
+    └── pos-tagging.ipynb        # POS tagging with NLTK
 ```
+
+## Usage
+
+Install dependencies:
+```bash
+pip install nltk pandas requests
+```
+
+Run preprocessing scripts from `Day_0_Introduction_to_NLP/` to see basic NLP operations in action.
 
 ## NLP Pipeline Flowchart
 
