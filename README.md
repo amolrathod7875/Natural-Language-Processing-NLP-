@@ -20,6 +20,7 @@ Natural Language Processing (NLP) is a field of artificial intelligence that ena
 ```
 NLP/
 ├── Day_0_Introduction_to_NLP/
+│   ├── README_1.md            # Assignment documentation for ass1.ipynb
 │   ├── ass1.ipynb              # Text preprocessing with NLTK (tokenization, stop-words, stemming)
 │   ├── tokenizer.py           # Text tokenization with NLTK
 │   ├── stopwords.py           # Stop word removal demonstration
@@ -63,7 +64,9 @@ NLP/
 │   ├── Bag_Of_Words.ipynb       # Bag of Words model
 │   └── IMDB Dataset.csv
 └── Day_5_Parts_of_Speech_Tagging/
-    └── pos-tagging.ipynb        # POS tagging with NLTK
+    ├── pos-tagging.ipynb       # POS tagging with spaCy
+    ├── ass_2.ipynb              # POS tagging and lemmatization with NLTK
+    └── README_2.md              # Assignment documentation for ass_2.ipynb
 ```
 
 ## Usage
