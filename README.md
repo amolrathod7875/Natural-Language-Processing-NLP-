@@ -20,6 +20,7 @@ Natural Language Processing (NLP) is a field of artificial intelligence that ena
 ```
 NLP/
 ├── Day_0_Introduction_to_NLP/
+│   ├── ass1.ipynb              # Text preprocessing with NLTK (tokenization, stop-words, stemming)
 │   ├── tokenizer.py           # Text tokenization with NLTK
 │   ├── stopwords.py           # Stop word removal demonstration
 │   ├── stemming_and_lemmatization.py  # Stem vs Lemma comparison
