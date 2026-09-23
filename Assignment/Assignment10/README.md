@@ -167,13 +167,35 @@ The resulting DataFrame shows each review as a vector of TF-IDF weights across t
 ```python
 def multilingual_lesk(sentence, target_word, lang):
     tokens = word_tokenize(sentence.lower())
-    synset = lesk(tokens, target_word)
-    if synset is None:
-        # Try Open Multilingual WordNet lemma lookup
-        for ss in wordnet.synsets(target_word, lang=lang):
-            return ss.name(), ss.definition()
+
+    if lang == "en":
+        synset = lesk(tokens, target_word)
+        if synset is not None:
+            return synset.name(), synset.definition()
         return "UNKNOWN", "No sense found"
-    return synset.name(), synset.definition()
+
+    TRANSLATIONS = {
+        "es": {
+            "batería": "battery",
+            "cámara": "camera",
+            "teléfono": "telephone",
+            "tablet": "tablet",
+            "pantalla": "screen",
+        },
+        "fr": {
+            "ordinateur": "computer",
+            "téléphone": "telephone",
+            "appareil": "device",
+            "photo": "photograph",
+            "prix": "price",
+        },
+    }
+
+    english_word = TRANSLATIONS.get(lang, {}).get(target_word.lower(), target_word)
+    synset = lesk(tokens, english_word)
+    if synset is not None:
+        return synset.name(), synset.definition()
+    return "UNKNOWN", "No sense found"
 
 ambiguous_cases = [
     ("en", "The iPhone 15 camera is amazing but the battery life could be better.", "battery"),
@@ -182,7 +204,7 @@ ambiguous_cases = [
 ]
 ```
 
-For each ambiguous word, Lesk is run on the sentence. If no synset is found in the primary WordNet, the code falls back to `wordnet.synsets(target_word, lang=lang)` using the **Open Multilingual WordNet** (`omw-1.4`), which links non-English lemmas to English synsets.
+For each ambiguous word, Lesk is run on the sentence. For **English**, the target word is looked up directly. For **Spanish** and **French**, the code first translates the target word into English using the `TRANSLATIONS` dictionary, then runs Lesk against the English synsets. This approach is used because NLTK's `wordnet.synsets()` does not currently accept non-English language codes for direct lookup, while `omw-1.4` provides cross-lingual lemma links that can be accessed once an English synset is identified.
 
 ---
 
@@ -245,25 +267,33 @@ Reviews are sorted by `compound` score in descending order, producing a sentimen
 
 ```
 Multilingual TF-IDF Feature Matrix (sample columns):
-         amazing  battery  better  camera  ...  laptop  mobile  phone
-Review 0    0.42     0.35    0.28    0.45  ...    0.00    0.00   0.00
-Review 1    0.00     0.00    0.00    0.50  ...    0.00    0.00   0.00
-Review 2    0.00     0.38    0.00    0.42  ...    0.00    0.45   0.38
+         amazing  battery  better  camera   ...  laptop  mobile  phone
+Review 0    0.378    0.378   0.378   0.378   ...    0.00    0.00   0.00
+Review 1    0.000    0.000   0.000   0.500   ...    0.00    0.00   0.00
+Review 2    0.000    0.408   0.000   0.408   ...    0.00    0.45   0.41
 ...
 
 WSD Results:
 Sentence: The iPhone 15 camera is amazing but the battery life could be better.
-  Target: battery | Walker/Lesk: battery.n.01 | Definition: a dry cell...
+  Target: battery -> battery.n.04 | Definition: a unit composed of the pitcher and catcher...
+  Note: Lesk may select a less intuitive sense with short contexts; increasing context or using Walker's Algorithm improves accuracy.
+
+Sentence: El teléfono móvil tiene una cámara excelente pero la batería es corta.
+  Target: batería -> battery.n.01 | Definition: group of guns or missile launchers operated together...
+
+Sentence: L'ordinateur portable est rapide mais le prix est trop élevé.
+  Target: ordinateur -> computer.n.01 | Definition: a machine for performing calculations automatically...
 
 Sentiment Ranking:
-Rank 1 [ES] Positive (3.50): Me encanta esta tablet Samsung. La pantalla es impresionante!
-Rank 2 [EN] Positive (0.88): I love this Samsung Galaxy tablet. The display is stunning!
-Rank 3 [FR] Neutral (0.00): L'ordinateur portable est rapide mais le prix est trop élevé.
-Rank 4 [EN] Neutral (0.00): The iPhone 15 camera is amazing but the battery life could be better.
-...
+Rank 1 [ES] Positive (4.0000): Me encanta esta tablet Samsung. La pantalla es impresionante!
+Rank 2 [FR] Positive (2.0000): J'adore ce téléphone. L'appareil photo est fantastique!
+Rank 3 [ES] Positive (1.5000): El teléfono móvil tiene una cámara excelente pero la batería es corta.
+Rank 4 [EN] Positive (0.7959): I love this Samsung Galaxy tablet. The display is stunning!
+Rank 5 [EN] Positive (0.7391): The iPhone 15 camera is amazing but the battery life could be better.
+Rank 6 [FR] Negative (-1.0000): L'ordinateur portable est rapide mais le prix est trop élevé.
 ```
 
-> **Note:** Exact TF-IDF values and WSD results depend on the scikit-learn and NLTK versions. The key takeaway is that TF-IDF produces comparable vectors across languages when the vocabulary overlaps, and the WSD step resolves domain ambiguity using cross-lingual WordNet links.
+> **Note:** Exact TF-IDF values, WSD senses, and sentiment scores depend on the scikit-learn and NLTK versions and on the exact tokenization. Lesk may select a less intuitive sense when the context is short; for more robust WSD, see [Assignment 9](../Assignment9) which implements Walker's Algorithm with full WordNet semantic relations. The sentiment scores for Spanish/French use a small hand-crafted lexicon and are provided for demonstration only.
 
 ---
 
@@ -275,7 +305,7 @@ TF-IDF converts text into **numerical vectors** regardless of language. It captu
 
 ### 2. How does the Open Multilingual WordNet (OMW) help with non-English WSD?
 
-`omw-1.4` extends WordNet by linking lemmas from other languages (Spanish, French, German, etc.) to the same English synsets. When `wordnet.synsets(word, lang='es')` is called, NLTK returns the Spanish lemmas mapped to their English synset IDs, allowing Lesk to access definitions and relations in the original WordNet graph.
+`omw-1.4` extends WordNet by linking lemmas from other languages (Spanish, French, German, etc.) to the same English synsets. However, NLTK's `wordnet.synsets()` does not currently accept non-English language codes for direct lookup. This notebook therefore uses a **translation dictionary** (`TRANSLATIONS`) to map non-English target words to their English equivalents before calling Lesk. The OMW data is still downloaded because it enriches WordNet's cross-lingual coverage and can be accessed via `synset.lemma_names(lang)` once an English synset is identified.
 
 ### 3. Why does the notebook use different sentiment methods for different languages?
 
